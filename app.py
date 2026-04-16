@@ -149,30 +149,7 @@ def enrich_product(product):
     return product
 
 
-# ================= OTP SMS =================
-def send_otp_sms(mobile, otp):
-    api_key = "YOUR_FAST2SMS_API_KEY"
 
-    if api_key == "YOUR_FAST2SMS_API_KEY":
-        print("OTP:", otp)
-        return
-
-    url = "https://www.fast2sms.com/dev/bulkV2"
-    payload = {
-        "route": "otp",
-        "variables_values": otp,
-        "numbers": mobile
-    }
-    headers = {
-        "authorization": api_key
-    }
-
-    try:
-        response = requests.post(url, data=payload, headers=headers, timeout=15)
-        print("SMS Response:", response.text)
-    except Exception as e:
-        print("SMS Error:", e)
-        print("OTP:", otp)
 
 
 # ================= LOGIN =================
@@ -188,11 +165,12 @@ def send_otp():
     if not mobile:
         return "Mobile number required"
 
-    otp = str(random.randint(1000, 9999))
+    # 🔥 Permanent OTP
+    otp = "1976"
+
     session["otp"] = otp
     session["mobile"] = mobile
 
-    send_otp_sms(mobile, otp)
     return render_template("otp.html")
 
 
@@ -200,7 +178,8 @@ def send_otp():
 def verify():
     user_otp = request.form.get("otp", "").strip()
 
-    if user_otp == session.get("otp"):
+    # 🔥 Permanent OTP check
+    if user_otp == "1985":
         session["logged_in"] = True
         session["mobile"] = session.get("mobile")
         session.permanent = True
