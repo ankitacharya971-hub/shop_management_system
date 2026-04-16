@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Udhar Customers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: white;
+        }
+
+        .header {
+            text-align: center;
+            padding: 18px;
+            font-size: 24px;
+            font-weight: bold;
+            background: rgba(0,0,0,0.25);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 20px 15px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+            margin-bottom: 20px;
+        }
+
+        .title {
+            margin: 0 0 15px;
+            font-size: 20px;
+        }
+
+        .search-box {
+            margin-bottom: 15px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .customer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.06);
+            margin-bottom: 10px;
+        }
+
+        .customer-name {
+            font-size: 16px;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .btn {
+            text-decoration: none;
+            background: #00c6ff;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: #0072ff;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 20px;
+            color: #d7e7ee;
+        }
+
+        .back {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .back a {
+            text-decoration: none;
+            color: white;
+            background: rgba(255,255,255,0.14);
+            padding: 10px 18px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        @media (max-width: 600px) {
+            .customer-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    💸 Udhar Customers
+</div>
+
+<div class="container">
+    <div class="card">
+        <h3 class="title">Customer List</h3>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search customer..." onkeyup="searchCustomer()">
+        </div>
+
+        <div id="customerList">
+            {% if customers and customers|length > 0 %}
+                {% for customer in customers %}
+                <div class="customer-row customer-item">
+                    <div class="customer-name">{{ customer }}</div>
+                    <a class="btn" href="/udhar_details/{{ customer }}">Details</a>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty">No udhar customer found.</div>
+            {% endif %}
+        </div>
+
+        <div class="back">
+            <a href="/dashboard">⬅ Back</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function searchCustomer() {
+    const input = document.getElementById("searchInput").value.toLowerCase();
+    const items = document.getElementsByClassName("customer-item");
+
+    for (let i = 0; i < items.length; i++) {
+        const name = items[i].querySelector(".customer-name").innerText.toLowerCase();
+        items[i].style.display = name.includes(input) ? "flex" : "none";
+    }
+}
+</script>
+
+</body>
+</html>

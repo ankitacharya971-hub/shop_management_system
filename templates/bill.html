@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Billing</title>
+
+    <style>
+        body {
+            background: #0f172a;
+            color: white;
+            text-align: center;
+            font-family: Arial;
+        }
+
+        .box {
+            background: #1e293b;
+            padding: 20px;
+            width: 350px;
+            margin: auto;
+            border-radius: 10px;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            background: #38bdf8;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .item {
+            background: #334155;
+            margin-top: 5px;
+            padding: 8px;
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        #qrBox {
+            display: none;
+            margin-top: 15px;
+        }
+
+        img {
+            width: 180px;
+        }
+    </style>
+
+</head>
+<body>
+
+<h2>Billing - ACHARYA HARDWARE</h2>
+
+<div class="box">
+
+<input type="text" id="customer" placeholder="Customer Name">
+
+<select id="product">
+{% for p in products %}
+<option value="{{p[0]}}" 
+data-unit="{{p[2]}}" 
+data-alt="{{p[3]}" 
+data-conv="{{p[4]}}">
+{{p[1]}} (Stock: {{p[5]}})
+</option>
+{% endfor %}
+</select>
+
+<select id="mode">
+<option value="unit">Main Unit</option>
+<option value="alt">Alternate Unit</option>
+</select>
+
+<input type="number" id="qty" placeholder="Quantity">
+
+<input type="number" id="price" placeholder="Selling Price">
+
+<button onclick="addToCart()">➕ Add</button>
+
+<div id="cart"></div>
+
+<h3>Total ₹<span id="total">0</span></h3>
+
+<select id="payment" onchange="handlePayment()">
+<option value="Cash">Cash</option>
+<option value="UPI">UPI</option>
+<option value="Udhar">Udhar</option>
+</select>
+
+<input type="date" id="due_date" style="display:none;">
+
+<div id="qrBox">
+<h3>Scan & Pay</h3>
+<img id="qrImage">
+</div>
+
+<button onclick="saveBill()">Generate Bill</button>
+
+</div>
+
+<script>
+
+let cart = [];
+let total = 0;
+
+// ADD TO CART
+function addToCart() {
+    let product = document.getElementById("product");
+    let id = product.value;
+    let name = product.options[product.selectedIndex].text;
+
+    let mode = document.getElementById("mode").value;
+    let qty = parseFloat(document.getElementById("qty").value);
+    let price = parseFloat(document.getElementById("price").value);
+
+    let conv = parseFloat(product.options[product.selectedIndex].getAttribute("data-conv"));
+
+    if (!qty || !price) return;
+
+    let finalQty = (mode === "unit") ? qty * conv : qty;
+
+    let itemTotal = finalQty * price;
+
+    cart.push({id, qty: finalQty, price});
+
+    total += itemTotal;
+
+    document.getElementById("cart").innerHTML += 
+        `<div class="item">${name} - ${finalQty} pcs × ₹${price}</div>`;
+
+    document.getElementById("total").innerText = total;
+}
+
+// PAYMENT HANDLE
+function handlePayment() {
+    let payment = document.getElementById("payment").value;
+    let due = document.getElementById("due_date");
+    let qr = document.getElementById("qrBox");
+
+    if (payment === "Udhar") {
+        due.style.display = "block";
+        qr.style.display = "none";
+    } 
+    else if (payment === "UPI") {
+        due.style.display = "none";
+        qr.style.display = "block";
+
+        let upi = "upi://pay?pa=8822869890@ibl&pn=AcharyaHardware&am=" + total;
+        let qrURL = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(upi);
+
+        document.getElementById("qrImage").src = qrURL;
+    } 
+    else {
+        due.style.display = "none";
+        qr.style.display = "none";
+    }
+}
+
+// SAVE BILL
+function saveBill() {
+    let customer = document.getElementById("customer").value;
+    let payment = document.getElementById("payment").value;
+    let due_date = document.getElementById("due_date").value;
+
+    fetch('/save_bill', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            customer: customer,
+            total: total,
+            payment: payment,
+            due_date: due_date,
+            items: cart
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert("Bill Saved Successfully!");
+        location.reload();
+    });
+}
+
+</script>
+
+</body>
+</html>

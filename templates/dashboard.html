@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0f2027;
+            color: white;
+        }
+
+        .header {
+            background: #203a43;
+            padding: 18px 15px;
+            text-align: center;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .header p {
+            margin: 8px 0 0;
+            font-size: 14px;
+            color: #d7e6ec;
+        }
+
+        .container {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background: #2c5364;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        .card:hover {
+            background: #00c6ff;
+            transform: translateY(-2px);
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+        }
+
+        .logout {
+            padding: 0 20px 25px;
+            text-align: center;
+        }
+
+        .logout a {
+            display: inline-block;
+            background: red;
+            padding: 10px 20px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h2>🏪 Shop Dashboard</h2>
+    <p>Logged in: {{ session['mobile'] }}</p>
+</div>
+
+<div class="container">
+    <a href="/stock"><div class="card">📦 Stock</div></a>
+    <a href="/billing"><div class="card">💰 Billing</div></a>
+    <a href="/low_stock"><div class="card">⚠ Low Stock</div></a>
+    <a href="/udhar"><div class="card">💸 Udhar</div></a>
+    <a href="/profit"><div class="card">📊 Profit</div></a>
+</div>
+
+<div class="logout">
+    <a href="/logout">Logout</a>
+</div>
+
+</body>
+</html>

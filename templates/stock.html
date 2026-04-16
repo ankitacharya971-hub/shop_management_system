@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: white;
+        }
+
+        .header {
+            padding: 18px 15px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(6px);
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px 15px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.30);
+        }
+
+        .card h3 {
+            margin: 0 0 18px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .field label {
+            font-size: 14px;
+            margin-bottom: 6px;
+            color: #dbe7ec;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            border: none;
+            border-radius: 10px;
+            outline: none;
+            font-size: 15px;
+            background: rgba(255,255,255,0.95);
+            color: #111;
+        }
+
+        input::placeholder {
+            color: #777;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.25s ease;
+            margin-top: 6px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(0, 114, 255, 0.35);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: 14px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 900px;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 14px;
+        }
+
+        thead th {
+            background: #00c6ff;
+            color: #06202b;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 14px 10px;
+            text-align: center;
+        }
+
+        tbody td {
+            padding: 14px 10px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.10);
+            background: rgba(255,255,255,0.04);
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover td {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .stock-main {
+            font-size: 16px;
+            font-weight: 700;
+            color: #00e0ff;
+        }
+
+        .stock-sub {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #d4e3e9;
+        }
+
+        .price-line {
+            line-height: 1.6;
+            white-space: nowrap;
+        }
+
+        .low td {
+            background: rgba(255, 77, 77, 0.22) !important;
+        }
+
+        .back-box {
+            text-align: center;
+            margin-top: 18px;
+        }
+
+        .back-box a {
+            display: inline-block;
+            text-decoration: none;
+            color: white;
+            background: rgba(255,255,255,0.14);
+            padding: 11px 22px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+        .back-box a:hover {
+            background: rgba(255,255,255,0.22);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                font-size: 20px;
+                padding: 16px 12px;
+            }
+
+            .container {
+                padding: 14px;
+            }
+
+            .card {
+                padding: 16px;
+                border-radius: 14px;
+            }
+
+            .card h3 {
+                font-size: 18px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .full-width {
+                grid-column: auto;
+            }
+
+            input {
+                font-size: 16px;
+            }
+
+            .btn {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    📦 Smart Stock System
+</div>
+
+<div class="container">
+
+    <div class="card">
+        <h3>Add / Update Stock</h3>
+
+        <form method="POST" action="/add_stock">
+            <div class="form-grid">
+
+                <div class="field full-width">
+                    <label>Product Name</label>
+                    <input type="text" name="name" placeholder="Enter product name" required>
+                </div>
+
+                <div class="field">
+                    <label>Main Unit</label>
+                    <input type="text" name="main_unit" placeholder="Main unit" required>
+                </div>
+
+                <div class="field">
+                    <label>Alternate Unit</label>
+                    <input type="text" name="alt_unit" placeholder="Alternate unit" required>
+                </div>
+
+                <div class="field full-width">
+                    <label>Conversion</label>
+                    <input type="number" step="any" name="conversion" placeholder="1 Main Unit = ? Alternate Unit" required>
+                </div>
+
+                <div class="field">
+                    <label>Main Unit Stock</label>
+                    <input type="number" step="any" name="main_stock" placeholder="Enter main stock" required>
+                </div>
+
+                <div class="field">
+                    <label>Extra Alternate Stock</label>
+                    <input type="number" step="any" name="alt_stock" placeholder="Enter extra alt stock" required>
+                </div>
+
+                <div class="field">
+                    <label>Purchase Price (Main Unit)</label>
+                    <input type="number" step="any" name="purchase_price_main" placeholder="Enter purchase price" required>
+                </div>
+
+                <div class="field">
+                    <label>Selling Price (Main Unit)</label>
+                    <input type="number" step="any" name="min_price_main" placeholder="Enter selling price" required>
+                </div>
+
+                <div class="field full-width">
+                    <label>Low Stock Limit (Alt Unit)</label>
+                    <input type="number" step="any" name="low_stock_limit_alt" placeholder="Enter low stock limit" required>
+                </div>
+
+                <div class="full-width">
+                    <button class="btn" type="submit">Save Stock</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Current Stock</h3>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Available Stock</th>
+                        <th>Total Alt Stock</th>
+                        <th>Units</th>
+                        <th>Conversion</th>
+                        <th>Purchase Price</th>
+                        <th>Selling Price</th>
+                        <th>Low Stock Limit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+                    <tr {% if p['stock_alt'] <= p['low_stock_limit_alt'] %}class="low"{% endif %}>
+                        <td>{{ p['name'] }}</td>
+
+                        <td>
+                            <div class="stock-main">{{ p['stock_text'] }}</div>
+                            <div class="stock-sub">
+                                {{ p['stock_main_part'] }} {{ p['main_unit'] }} + {{ p['stock_alt_part'] }} {{ p['alt_unit'] }}
+                            </div>
+                        </td>
+
+                        <td>{{ p['stock_alt'] }} {{ p['alt_unit'] }}</td>
+
+                        <td>{{ p['main_unit'] }} / {{ p['alt_unit'] }}</td>
+
+                        <td>1 {{ p['main_unit'] }} = {{ p['conversion'] }} {{ p['alt_unit'] }}</td>
+
+                        <td class="price-line">
+                            ₹ {{ p['purchase_price_main'] }} / {{ p['main_unit'] }}<br>
+                            ₹ {{ p['purchase_price_alt'] }} / {{ p['alt_unit'] }}
+                        </td>
+
+                        <td class="price-line">
+                            ₹ {{ p['min_price_main'] }} / {{ p['main_unit'] }}<br>
+                            ₹ {{ p['min_price_alt'] }} / {{ p['alt_unit'] }}
+                        </td>
+
+                        <td>{{ p['low_stock_limit_alt'] }} {{ p['alt_unit'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="back-box">
+            <a href="/dashboard">⬅ Back</a>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

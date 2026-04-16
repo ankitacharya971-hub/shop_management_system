@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shop Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="manifest" href="/static/manifest.json">
+
+    <script>
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/static/sw.js");
+    }
+    </script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .box {
+            background: rgba(255,255,255,0.10);
+            padding: 30px 22px;
+            width: 100%;
+            max-width: 340px;
+            border-radius: 16px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(0,0,0,0.45);
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            margin: 10px 0 8px;
+        }
+
+        p {
+            margin: 0 0 18px;
+            font-size: 14px;
+            color: #d9e7ee;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: none;
+            box-sizing: border-box;
+            font-size: 15px;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #00c6ff;
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background: #0072ff;
+        }
+
+        .footer {
+            margin-top: 15px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <img src="/static/icon.png" class="logo" alt="App Icon">
+
+    <h2>Shop Login</h2>
+    <p>Enter your mobile number to receive OTP</p>
+
+    <form method="POST" action="/send_otp">
+        <input type="text" name="mobile" placeholder="Enter Mobile Number" required>
+        <button type="submit">Send OTP</button>
+    </form>
+
+    <div class="footer">
+        Secure Login via OTP 🔐
+    </div>
+</div>
+
+</body>
+</html>

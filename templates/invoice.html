@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ACHARYA HARDWARE & ELECTRICALS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .bill {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px dashed #000;
+            padding-bottom: 10px;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .header p {
+            margin: 5px 0;
+            font-size: 13px;
+        }
+
+        .info {
+            margin-top: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        th {
+            background: #eee;
+        }
+
+        .total {
+            margin-top: 15px;
+            font-size: 18px;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 12px;
+            color: gray;
+        }
+
+        .btn {
+            margin-top: 15px;
+            width: 100%;
+            padding: 12px;
+            background: #00c6ff;
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .btn:hover {
+            background: #0072ff;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .bill {
+                box-shadow: none;
+                border-radius: 0;
+                max-width: 100%;
+            }
+
+            .btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bill">
+    <div class="header">
+        <h2>🏪 ACHARYA HARDWARE & ELECTRICALS</h2>
+        <p>Authorized Hardware & Electrical Dealer</p>
+        <p>Thank you for your purchase</p>
+    </div>
+
+    <div class="info">
+        <p><b>Customer:</b> {{ customer }}</p>
+        <p><b>Date:</b> {{ date }}</p>
+    </div>
+
+    <table>
+        <tr>
+            <th>Item</th>
+            <th>Unit</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Total</th>
+        </tr>
+
+        {% for item in items %}
+        <tr>
+            <td>{{ item['name'] }}</td>
+            <td>{{ item['unit_label'] }}</td>
+            <td>{{ item['qty'] }}</td>
+            <td>₹ {{ item['price'] }}</td>
+            <td>₹ {{ item['line_total'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div class="total">
+        Total: ₹ {{ total }}
+    </div>
+
+    <button class="btn" onclick="window.print()">🖨 Print Bill</button>
+
+    <div class="footer">
+        Powered by Smart Billing System
+    </div>
+</div>
+
+</body>
+</html>

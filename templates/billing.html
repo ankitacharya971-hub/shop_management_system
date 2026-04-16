@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Billing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: white;
+            margin: 0;
+        }
+
+        .header {
+            background: #1c2b36;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .header p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            opacity: 0.85;
+        }
+
+        .container {
+            padding: 15px;
+        }
+
+        .card {
+            background: #203a43;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            margin: 0 0 12px 0;
+            font-size: 18px;
+        }
+
+        .hint {
+            font-size: 13px;
+            color: #d5e2e8;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #00c6ff;
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0072ff;
+        }
+
+        .secondary-btn {
+            background: #1fa855;
+        }
+
+        .secondary-btn:hover {
+            background: #168542;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        th {
+            background: #00c6ff;
+            color: black;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #555;
+            text-align: center;
+        }
+
+        .total-box {
+            background: #00c6ff;
+            color: black;
+            padding: 15px;
+            text-align: center;
+            border-radius: 10px;
+            font-size: 20px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .stock-preview {
+            margin-top: 4px;
+            font-size: 13px;
+            color: #dbe8ee;
+        }
+
+        a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>🏪 ACHARYA HARDWARE AND ELECTRICALS</h1>
+    <p>Billing • Smart Stock • Alternate Unit Sale</p>
+</div>
+
+<div class="container">
+
+    <div class="card">
+        <h3 class="section-title">Create Bill</h3>
+        <div class="hint">
+            Product choose karo, fir sell unit choose karo. Main unit ya alternate unit dono me billing kar sakte ho.
+        </div>
+
+        <input type="text" id="customer" placeholder="👤 Customer Name">
+
+        <select id="product" onchange="updatePricePreview()">
+            {% for p in products %}
+            <option
+                value="{{ p['id'] }}"
+                data-name="{{ p['name'] }}"
+                data-stock-alt="{{ p['stock_alt'] }}"
+                data-stock-text="{{ p['stock_text'] }}"
+                data-main-unit="{{ p['main_unit'] }}"
+                data-alt-unit="{{ p['alt_unit'] }}"
+                data-conversion="{{ p['conversion'] }}"
+                data-main-price="{{ p['min_price_main'] }}"
+                data-alt-price="{{ p['min_price_alt'] }}">
+                {{ p['name'] }} ({{ p['stock_text'] }})
+            </option>
+            {% endfor %}
+        </select>
+
+        <div class="stock-preview" id="stockPreview">Available stock: -</div>
+
+        <select id="sale_unit" onchange="updatePricePreview()">
+            <option value="main">Sell in Main Unit</option>
+            <option value="alt">Sell in Alternate Unit</option>
+        </select>
+
+        <input type="number" step="any" id="qty" placeholder="📦 Quantity">
+        <input type="number" step="any" id="price" placeholder="💸 Selling Price">
+
+        <button onclick="addItem()">➕ Add Item</button>
+    </div>
+
+    <div class="card">
+        <div class="table-wrap">
+            <table id="cart">
+                <tr>
+                    <th>Item</th>
+                    <th>Unit</th>
+                    <th>Qty</th>
+                    <th>₹ Price</th>
+                    <th>Total</th>
+                    <th>Remove</th>
+                </tr>
+            </table>
+        </div>
+
+        <div class="total-box">
+            Total: ₹ <span id="total">0.00</span>
+        </div>
+
+        <select id="payment">
+            <option value="Cash">Cash</option>
+            <option value="UPI">UPI</option>
+            <option value="Udhar">Udhar</option>
+        </select>
+
+        <button onclick="saveBill()">💾 Save Bill</button>
+        <button class="secondary-btn" onclick="sendWhatsApp()">📱 WhatsApp Bill</button>
+    </div>
+
+    <a href="/dashboard">⬅ Back</a>
+</div>
+
+<script>
+let cart = [];
+let total = 0;
+
+function getSelectedProduct() {
+    const product = document.getElementById("product");
+    return product.options[product.selectedIndex];
+}
+
+function updatePricePreview() {
+    const selected = getSelectedProduct();
+    const saleUnit = document.getElementById("sale_unit").value;
+    const priceInput = document.getElementById("price");
+    const stockPreview = document.getElementById("stockPreview");
+
+    const stockText = selected.getAttribute("data-stock-text");
+    const mainPrice = Number(selected.getAttribute("data-main-price"));
+    const altPrice = Number(selected.getAttribute("data-alt-price"));
+    const mainUnit = selected.getAttribute("data-main-unit");
+    const altUnit = selected.getAttribute("data-alt-unit");
+
+    stockPreview.innerText = "Available stock: " + stockText;
+
+    if (saleUnit === "main") {
+        priceInput.value = mainPrice.toFixed(2);
+        priceInput.placeholder = "💸 Selling Price per " + mainUnit;
+    } else {
+        priceInput.value = altPrice.toFixed(2);
+        priceInput.placeholder = "💸 Selling Price per " + altUnit;
+    }
+}
+
+function updateTotal() {
+    total = 0;
+    cart.forEach(item => {
+        total += Number(item.qty) * Number(item.price);
+    });
+    document.getElementById("total").innerText = total.toFixed(2);
+}
+
+function renderCart() {
+    let table = document.getElementById("cart");
+
+    table.innerHTML = `
+        <tr>
+            <th>Item</th>
+            <th>Unit</th>
+            <th>Qty</th>
+            <th>₹ Price</th>
+            <th>Total</th>
+            <th>Remove</th>
+        </tr>
+    `;
+
+    cart.forEach((item, index) => {
+        let row = table.insertRow();
+        row.insertCell(0).innerText = item.name;
+        row.insertCell(1).innerText = item.unit_label;
+        row.insertCell(2).innerText = item.qty;
+        row.insertCell(3).innerText = Number(item.price).toFixed(2);
+        row.insertCell(4).innerText = (Number(item.qty) * Number(item.price)).toFixed(2);
+        row.insertCell(5).innerHTML = `<button onclick="removeItem(${index})" style="margin:0; padding:8px;">❌</button>`;
+    });
+
+    updateTotal();
+}
+
+function addItem() {
+    const selected = getSelectedProduct();
+    const qtyInput = document.getElementById("qty");
+    const priceInput = document.getElementById("price");
+    const saleUnit = document.getElementById("sale_unit").value;
+
+    let qty = Number(qtyInput.value);
+    let price = Number(priceInput.value);
+
+    if (!qtyInput.value || !priceInput.value) {
+        alert("Enter Quantity and Price");
+        return;
+    }
+
+    if (qty <= 0 || price <= 0) {
+        alert("Quantity and price must be greater than 0");
+        return;
+    }
+
+    const id = Number(selected.value);
+    const name = selected.getAttribute("data-name");
+    const stockAlt = Number(selected.getAttribute("data-stock-alt"));
+    const conversion = Number(selected.getAttribute("data-conversion"));
+    const mainUnit = selected.getAttribute("data-main-unit");
+    const altUnit = selected.getAttribute("data-alt-unit");
+
+    let baseQty = qty;
+    let unitLabel = altUnit;
+
+    if (saleUnit === "main") {
+        baseQty = qty * conversion;
+        unitLabel = mainUnit;
+    }
+
+    let cartBaseQty = 0;
+    cart.forEach(item => {
+        if (item.id === id) {
+            cartBaseQty += Number(item.base_qty);
+        }
+    });
+
+    if ((cartBaseQty + baseQty) > stockAlt) {
+        alert("Stock not available");
+        return;
+    }
+
+    cart.push({
+        id: id,
+        name: name,
+        qty: qty,
+        price: price,
+        sale_unit: saleUnit,
+        unit_label: unitLabel,
+        base_qty: baseQty
+    });
+
+    renderCart();
+
+    qtyInput.value = "";
+    updatePricePreview();
+}
+
+function removeItem(index) {
+    cart.splice(index, 1);
+    renderCart();
+}
+
+function saveBill() {
+    let customer = document.getElementById("customer").value.trim();
+    let payment = document.getElementById("payment").value;
+
+    if (cart.length === 0) {
+        alert("Cart is empty");
+        return;
+    }
+
+    fetch("/save_bill", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            customer: customer || "Walk-in Customer",
+            total: total,
+            payment: payment,
+            items: cart
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success") {
+            alert("Bill Saved ✔");
+            window.open("/invoice_html/" + data.sale_id, "_blank");
+            location.reload();
+        } else {
+            alert(data.message || "Error saving bill");
+        }
+    })
+    .catch(() => {
+        alert("Server error");
+    });
+}
+
+function sendWhatsApp() {
+    if (cart.length === 0) {
+        alert("Cart is empty");
+        return;
+    }
+
+    let customer = document.getElementById("customer").value.trim() || "Customer";
+    let message = "🏪 ACHARYA HARDWARE AND ELECTRICALS\n\n";
+    message += "👤 Customer: " + customer + "\n";
+    message += "🧾 Bill Details:\n\n";
+
+    cart.forEach(item => {
+        message += item.name + " | " + item.qty + " " + item.unit_label + " | ₹" + (Number(item.qty) * Number(item.price)).toFixed(2) + "\n";
+    });
+
+    message += "\nTotal: ₹ " + total.toFixed(2);
+
+    let url = "https://wa.me/?text=" + encodeURIComponent(message);
+    window.open(url, "_blank");
+}
+
+window.onload = function() {
+    updatePricePreview();
+};
+</script>
+
+</body>
+</html>
